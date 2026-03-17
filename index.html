@@ -185,12 +185,19 @@
                 right: 20px;
             }
             
-            .panel-toggle.visible {
-                display: none;
+            /* 移动端折叠时显示展开按钮 */
+            .panel-toggle.hidden {
+                display: flex;
             }
         }
 
         @media (min-width: 769px) {
+            /* 桌面端面板按钮始终可见 */
+            .panel-toggle {
+                opacity: 1;
+                pointer-events: auto;
+            }
+            
             .panel-drag-handle,
             .panel-close-mobile {
                 display: none;
@@ -266,9 +273,11 @@
 
         @media (max-width: 768px) {
             .music-toggle {
-                right: 20px;
+                right: 70px;
                 top: auto;
                 bottom: 80px;
+                opacity: 1;
+                pointer-events: auto;
             }
         }
 
@@ -1640,10 +1649,21 @@
 
             const panelToggle = document.getElementById('panelToggle');
             const controlPanel = document.getElementById('controlPanel');
+            
+            // 面板按钮始终可见，根据状态切换图标
+            function updatePanelToggle() {
+                const isCollapsed = controlPanel.classList.contains('collapsed');
+                panelToggle.textContent = isCollapsed ? '☰' : '×';
+                panelToggle.style.display = 'flex';
+            }
+            
             panelToggle.addEventListener('click', () => {
                 controlPanel.classList.toggle('collapsed');
-                panelToggle.classList.toggle('visible', controlPanel.classList.contains('collapsed'));
+                updatePanelToggle();
             });
+            
+            // 初始化面板按钮状态
+            updatePanelToggle();
 
             // 背景音乐 - 使用本地音频文件
             const musicToggle = document.getElementById('musicToggle');
@@ -1675,7 +1695,7 @@
             if (panelCloseBtn) {
                 panelCloseBtn.addEventListener('click', () => {
                     controlPanel.classList.add('collapsed');
-                    panelToggle.classList.remove('visible');
+                    updatePanelToggle();
                 });
             }
 
