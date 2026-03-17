@@ -962,17 +962,21 @@
         // 镜面配置 - 严格按照史料参数
         const mirrorConfig = {
             // 8面水平镜（八方）- 对应华严"八方"
-            east: { pos: new THREE.Vector3(1.75, 0, 0), rot: new THREE.Euler(0, Math.PI / 2, 0), name: '正东' },
-            west: { pos: new THREE.Vector3(-1.75, 0, 0), rot: new THREE.Euler(0, -Math.PI / 2, 0), name: '正西' },
-            north: { pos: new THREE.Vector3(0, 1.75, 0), rot: new THREE.Euler(0, 0, 0), name: '正北' },
-            south: { pos: new THREE.Vector3(0, -1.75, 0), rot: new THREE.Euler(0, Math.PI, 0), name: '正南' },
-            northeast: { pos: new THREE.Vector3(1.237, 1.237, 0), rot: new THREE.Euler(0, -Math.PI * 3 / 4, 0), name: '东北' },
-            southwest: { pos: new THREE.Vector3(-1.237, -1.237, 0), rot: new THREE.Euler(0, Math.PI * 3 / 4, 0), name: '西南' },
-            southeast: { pos: new THREE.Vector3(1.237, -1.237, 0), rot: new THREE.Euler(0, Math.PI / 4, 0), name: '东南' },
-            northwest: { pos: new THREE.Vector3(-1.237, 1.237, 0), rot: new THREE.Euler(0, -Math.PI / 4, 0), name: '西北' },
+            // 坐标：X=东西，Y=南北，Z=垂直（上方+）
+            // 镜面法线必须指向中心(0,0,0)
+            // 旋转角度：使镜面朝向中心方向
+            east: { pos: new THREE.Vector3(1.75, 0, 0), rot: new THREE.Euler(0, 0, 0), name: '正东', facing: '西' },
+            west: { pos: new THREE.Vector3(-1.75, 0, 0), rot: new THREE.Euler(0, Math.PI, 0), name: '正西', facing: '东' },
+            north: { pos: new THREE.Vector3(0, 1.75, 0), rot: new THREE.Euler(0, Math.PI / 2, 0), name: '正北', facing: '南' },
+            south: { pos: new THREE.Vector3(0, -1.75, 0), rot: new THREE.Euler(0, -Math.PI / 2, 0), name: '正南', facing: '北' },
+            northeast: { pos: new THREE.Vector3(1.237, 1.237, 0), rot: new THREE.Euler(0, -Math.PI * 3 / 4, 0), name: '东北', facing: '西南' },
+            southwest: { pos: new THREE.Vector3(-1.237, -1.237, 0), rot: new THREE.Euler(0, Math.PI * 3 / 4, 0), name: '西南', facing: '东北' },
+            southeast: { pos: new THREE.Vector3(1.237, -1.237, 0), rot: new THREE.Euler(0, -Math.PI / 4, 0), name: '东南', facing: '西北' },
+            northwest: { pos: new THREE.Vector3(-1.237, 1.237, 0), rot: new THREE.Euler(0, Math.PI / 4, 0), name: '西北', facing: '东南' },
             // 2面垂直镜（天地）- 对应华严"天圆地方"
-            top: { pos: new THREE.Vector3(0, 0, 1.75), rot: new THREE.Euler(Math.PI / 2, 0, 0), name: '天' },
-            bottom: { pos: new THREE.Vector3(0, 0, -1.75), rot: new THREE.Euler(-Math.PI / 2, 0, 0), name: '地' }
+            // Z轴为垂直方向，+Z为天，-Z为地
+            top: { pos: new THREE.Vector3(0, 0, 1.75), rot: new THREE.Euler(-Math.PI / 2, 0, 0), name: '天', facing: '地' },
+            bottom: { pos: new THREE.Vector3(0, 0, -1.75), rot: new THREE.Euler(Math.PI / 2, 0, 0), name: '地', facing: '天' }
         };
 
         function init() {
