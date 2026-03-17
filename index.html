@@ -1072,60 +1072,121 @@
 
             switch(type) {
                 case 'buddha':
-                    // 佛像身体
-                    const bodyGeom = new THREE.CylinderGeometry(0.1, 0.14, 0.32, 32);
-                    const bodyMat = new THREE.MeshStandardMaterial({
-                        color: 0xd4af37,
-                        metalness: 0.75,
-                        roughness: 0.25,
+                    // 使用用户提供的佛像图片作为纹理
+                    const textureLoader = new THREE.TextureLoader();
+                    
+                    // 加载佛像正面和背面纹理
+                    const frontTexture = textureLoader.load('53-3-Q版-大日如來.png');
+                    const backTexture = textureLoader.load('53-4-Q版-大日如來.png');
+                    
+                    // 佛像材质 - 使用图片纹理
+                    const buddhaMat = new THREE.MeshStandardMaterial({
+                        map: frontTexture,
+                        metalness: 0.3,
+                        roughness: 0.6,
                         emissive: 0x221100,
-                        emissiveIntensity: 0.1
+                        emissiveIntensity: 0.15
                     });
-                    const body = new THREE.Mesh(bodyGeom, bodyMat);
-                    body.position.y = 0.16;
-                    body.castShadow = true;
-                    group.add(body);
 
-                    // 佛首
-                    const headGeom = new THREE.SphereGeometry(0.09, 32, 32);
-                    const head = new THREE.Mesh(headGeom, bodyMat);
-                    head.position.y = 0.38;
-                    head.scale.y = 1.1;
-                    head.castShadow = true;
-                    group.add(head);
+                    // 佛像主体 - 使用平面几何体显示纹理
+                    const buddhaPlaneGeom = new THREE.PlaneGeometry(0.28, 0.4);
+                    
+                    // 正面
+                    const buddhaFront = new THREE.Mesh(buddhaPlaneGeom, buddhaMat);
+                    buddhaFront.position.y = 0.2;
+                    buddhaFront.position.z = 0.01;
+                    buddhaFront.castShadow = true;
+                    group.add(buddhaFront);
+                    
+                    // 背面
+                    const backMat = new THREE.MeshStandardMaterial({
+                        map: backTexture,
+                        metalness: 0.3,
+                        roughness: 0.6,
+                        emissive: 0x221100,
+                        emissiveIntensity: 0.15,
+                        side: THREE.DoubleSide
+                    });
+                    const buddhaBack = new THREE.Mesh(buddhaPlaneGeom, backMat);
+                    buddhaBack.position.y = 0.2;
+                    buddhaBack.position.z = -0.01;
+                    buddhaBack.rotation.y = Math.PI;
+                    buddhaBack.castShadow = true;
+                    group.add(buddhaBack);
 
-                    // 髻
-                    const ushnishaGeom = new THREE.SphereGeometry(0.05, 16, 16);
-                    const ushnisha = new THREE.Mesh(ushnishaGeom, bodyMat);
-                    ushnisha.position.y = 0.47;
-                    group.add(ushnisha);
+                    // 莲花底座
+                    const lotusGeom = new THREE.CylinderGeometry(0.16, 0.2, 0.08, 32);
+                    const lotusMat = new THREE.MeshStandardMaterial({
+                        color: 0xff6b9d,
+                        metalness: 0.4,
+                        roughness: 0.5,
+                        emissive: 0x330011,
+                        emissiveIntensity: 0.2
+                    });
+                    const lotus = new THREE.Mesh(lotusGeom, lotusMat);
+                    lotus.position.y = -0.04;
+                    lotus.receiveShadow = true;
+                    group.add(lotus);
 
-                    // 光环 - 更明显
-                    const haloGeom = new THREE.TorusGeometry(0.15, 0.012, 16, 64);
+                    // 莲花花瓣
+                    const petalCount = 12;
+                    for (let i = 0; i < petalCount; i++) {
+                        const angle = (i / petalCount) * Math.PI * 2;
+                        const petalGeom = new THREE.SphereGeometry(0.04, 8, 8);
+                        petalGeom.scale(1, 0.3, 0.5);
+                        const petalMat = new THREE.MeshStandardMaterial({
+                            color: 0xffb6c1,
+                            metalness: 0.3,
+                            roughness: 0.6,
+                            emissive: 0x220011,
+                            emissiveIntensity: 0.15
+                        });
+                        const petal = new THREE.Mesh(petalGeom, petalMat);
+                        petal.position.set(
+                            Math.cos(angle) * 0.12,
+                            0.02,
+                            Math.sin(angle) * 0.12
+                        );
+                        petal.rotation.x = -Math.PI / 4;
+                        petal.rotation.y = angle;
+                        group.add(petal);
+                    }
+
+                    // 光环 - 更明显更庄严
+                    const haloGeom = new THREE.TorusGeometry(0.22, 0.015, 16, 64);
                     const haloMat = new THREE.MeshBasicMaterial({
                         color: 0xffdd88,
                         transparent: true,
-                        opacity: 0.8
+                        opacity: 0.85
                     });
                     const halo = new THREE.Mesh(haloGeom, haloMat);
-                    halo.position.y = 0.38;
+                    halo.position.y = 0.32;
                     halo.rotation.x = Math.PI / 2;
                     group.add(halo);
                     
                     // 第二层光环
-                    const halo2Geom = new THREE.TorusGeometry(0.2, 0.006, 16, 64);
+                    const halo2Geom = new THREE.TorusGeometry(0.28, 0.008, 16, 64);
                     const halo2Mat = new THREE.MeshBasicMaterial({
                         color: 0xffaa55,
                         transparent: true,
-                        opacity: 0.5
+                        opacity: 0.6
                     });
                     const halo2 = new THREE.Mesh(halo2Geom, halo2Mat);
-                    halo2.position.y = 0.38;
+                    halo2.position.y = 0.32;
                     halo2.rotation.x = Math.PI / 2;
                     group.add(halo2);
 
-                    // 底座
-                    const baseGeom = new THREE.CylinderGeometry(0.18, 0.22, 0.06, 32);
+                    // 第三层光圈
+                    const halo3Geom = new THREE.TorusGeometry(0.34, 0.004, 16, 64);
+                    const halo3Mat = new THREE.MeshBasicMaterial({
+                        color: 0xff8844,
+                        transparent: true,
+                        opacity: 0.35
+                    });
+                    const halo3 = new THREE.Mesh(halo3Geom, halo3Mat);
+                    halo3.position.y = 0.32;
+                    halo3.rotation.x = Math.PI / 2;
+                    group.add(halo3);
                     const baseMat = new THREE.MeshStandardMaterial({
                         color: 0x6b4423,
                         metalness: 0.4,
