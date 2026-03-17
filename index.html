@@ -1154,9 +1154,9 @@
                     // 使用用户提供的佛像图片作为纹理
                     const textureLoader = new THREE.TextureLoader();
                     
-                    // 加载佛像正面和背面纹理
-                    const frontTexture = textureLoader.load('53-3-Q版-大日如來.png');
-                    const backTexture = textureLoader.load('53-4-Q版-大日如來.png');
+                    // 加载佛像正面和背面纹理 - 使用压缩后的小图
+                    const frontTexture = textureLoader.load('53-3-Q版-大日如來-small.png');
+                    const backTexture = textureLoader.load('53-4-Q版-大日如來-small.png');
                     
                     // 佛像材质 - 提高发光强度使其更清晰可见
                     const buddhaMat = new THREE.MeshStandardMaterial({
