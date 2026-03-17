@@ -131,6 +131,72 @@
             pointer-events: none;
         }
 
+        /* 移动端面板样式 */
+        @media (max-width: 768px) {
+            .control-panel {
+                width: calc(100% - 32px);
+                right: 16px;
+                top: auto;
+                bottom: 64px;
+                border-radius: 16px 16px 0 0;
+                transform: translateY(100%);
+                opacity: 0;
+                max-height: 55vh;
+                padding-bottom: 24px;
+                pointer-events: none;
+            }
+
+            .control-panel:not(.collapsed) {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            /* 移动端拖拽手柄 */
+            .panel-drag-handle {
+                display: block;
+                width: 40px;
+                height: 4px;
+                background: rgba(212, 175, 55, 0.4);
+                border-radius: 2px;
+                margin: 0 auto 16px;
+                cursor: grab;
+            }
+            
+            /* 移动端收起按钮 */
+            .panel-close-mobile {
+                display: flex;
+                justify-content: center;
+                margin-top: 12px;
+            }
+            
+            .panel-close-btn {
+                font-size: 12px;
+                padding: 8px 16px;
+                opacity: 0.7;
+            }
+            
+            /* 移动端展开按钮始终显示 */
+            .panel-toggle {
+                opacity: 1;
+                pointer-events: auto;
+                top: auto;
+                bottom: 80px;
+                right: 20px;
+            }
+            
+            .panel-toggle.visible {
+                display: none;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .panel-drag-handle,
+            .panel-close-mobile {
+                display: none;
+            }
+        }
+
         .panel-toggle {
             position: fixed;
             top: 92px;
@@ -648,7 +714,11 @@
     </div>
 
     <button class="panel-toggle" id="panelToggle">☰</button>
-    <div class="control-panel" id="controlPanel">
+    <div class="control-panel collapsed" id="controlPanel">
+        <div class="panel-drag-handle" id="panelDragHandle"></div>
+        <div class="panel-close-mobile">
+            <button class="btn panel-close-btn" id="panelCloseBtn">▼ 收起面板</button>
+        </div>
         <div class="control-group">
             <label class="control-label">
                 光源强度
@@ -1477,6 +1547,30 @@
                 controlPanel.classList.toggle('collapsed');
                 panelToggle.classList.toggle('visible', controlPanel.classList.contains('collapsed'));
             });
+
+            // 移动端收起按钮
+            const panelCloseBtn = document.getElementById('panelCloseBtn');
+            if (panelCloseBtn) {
+                panelCloseBtn.addEventListener('click', () => {
+                    controlPanel.classList.add('collapsed');
+                    panelToggle.classList.remove('visible');
+                });
+            }
+
+            // 移动端触摸滑动关闭
+            let touchStartY = 0;
+            const panelDragHandle = document.getElementById('panelDragHandle');
+            if (panelDragHandle) {
+                panelDragHandle.addEventListener('touchstart', (e) => {
+                    touchStartY = e.touches[0].clientY;
+                });
+                panelDragHandle.addEventListener('touchend', (e) => {
+                    const touchEndY = e.changedTouches[0].clientY;
+                    if (touchStartY - touchEndY > 50) {
+                        controlPanel.classList.add('collapsed');
+                    }
+                });
+            }
 
             document.addEventListener('keydown', (e) => {
                 switch(e.key.toLowerCase()) {
