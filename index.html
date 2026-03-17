@@ -934,12 +934,8 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { Reflector } from 'three/addons/objects/Reflector.js';
-        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-        import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-        let scene, camera, renderer, controls, composer;
+        let scene, camera, renderer, controls;
         let mirrors = [];
         let mirrorReflectors = [];
         let centerObject;
