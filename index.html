@@ -948,7 +948,7 @@
         let clock = new THREE.Clock();
         let frameCount = 0;
         let lastFpsUpdate = 0;
-        let reflectionLayers = 6;
+        let reflectionLayers = 4;
         
         // 光线可视化
         let rayLines = [];
@@ -988,7 +988,7 @@
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -1082,7 +1082,7 @@
                 const mirrorGeometry = new THREE.PlaneGeometry(mirrorSize, mirrorSize);
 
                 // 优化：使用较小的纹理尺寸以提高性能
-                const textureSize = Math.min(512, Math.max(256, window.innerWidth / 4));
+                const textureSize = Math.min(256, Math.max(128, window.innerWidth / 8));
                 
                 const reflector = new Reflector(mirrorGeometry, {
                     clipBias: 0.003,
@@ -1208,29 +1208,17 @@
                     lotus.receiveShadow = true;
                     group.add(lotus);
 
-                    // 添加发光光环效果 - 让中心更醒目
-                    const glowRingGeom = new THREE.TorusGeometry(0.35, 0.015, 16, 64);
+                    // 添加发光光环效果 - 简化几何体提升性能
+                    const glowRingGeom = new THREE.TorusGeometry(0.35, 0.015, 8, 32);
                     const glowRingMat = new THREE.MeshBasicMaterial({
                         color: 0xffaa44,
                         transparent: true,
-                        opacity: 0.6
+                        opacity: 0.4
                     });
                     const glowRing = new THREE.Mesh(glowRingGeom, glowRingMat);
                     glowRing.rotation.x = Math.PI / 2;
                     glowRing.position.y = 0.02;
                     group.add(glowRing);
-
-                    // 第二层光环
-                    const glowRing2Geom = new THREE.TorusGeometry(0.45, 0.008, 16, 64);
-                    const glowRing2Mat = new THREE.MeshBasicMaterial({
-                        color: 0xff8844,
-                        transparent: true,
-                        opacity: 0.3
-                    });
-                    const glowRing2 = new THREE.Mesh(glowRing2Geom, glowRing2Mat);
-                    glowRing2.rotation.x = Math.PI / 2;
-                    glowRing2.position.y = 0.01;
-                    group.add(glowRing2);
 
                     // 莲花花瓣
                     const buddhaPetalCount = 12;
@@ -1453,8 +1441,8 @@
             lightSource.shadow.radius = 4;
             scene.add(lightSource);
 
-            // 光源发光点 - 更明显
-            const lightSphereGeom = new THREE.SphereGeometry(0.025, 16, 16);
+            // 光源发光点 - 简化几何体
+            const lightSphereGeom = new THREE.SphereGeometry(0.025, 8, 8);
             const lightSphereMat = new THREE.MeshBasicMaterial({
                 color: 0xffdd99
             });
@@ -1463,12 +1451,12 @@
             lightSphere.name = 'lightSphere';
             scene.add(lightSphere);
             
-            // 光源外层光晕
-            const glowGeom = new THREE.SphereGeometry(0.06, 16, 16);
+            // 光源外层光晕 - 简化
+            const glowGeom = new THREE.SphereGeometry(0.06, 8, 8);
             const glowMat = new THREE.MeshBasicMaterial({
                 color: 0xffaa44,
                 transparent: true,
-                opacity: 0.3
+                opacity: 0.2
             });
             const lightGlow = new THREE.Mesh(glowGeom, glowMat);
             lightGlow.position.copy(lightSource.position);
@@ -1819,7 +1807,7 @@
             composer.setSize(window.innerWidth, window.innerHeight);
 
             // 更新反射器尺寸
-            const textureSize = Math.min(512, Math.max(256, window.innerWidth / 4));
+            const textureSize = Math.min(256, Math.max(128, window.innerWidth / 8));
             mirrorReflectors.forEach(reflector => {
                 reflector.getRenderTarget().setSize(
                     textureSize * renderer.getPixelRatio(),
