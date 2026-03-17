@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>镜灯之阵（法藏十镜无尽阵）</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500&family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --color-gold: #d4af37;
+            --color-bronze: #8b4513;
+            --color-text: #e8e4d9;
+            --color-teal: #2d5a4a;
+            --color-mirror-border: #b8860b;
+            --panel-bg: rgba(10, 10, 15, 0.92);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg-primary);
+            color: var(--color-text);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 72px;
+            background: linear-gradient(180deg, var(--panel-bg) 0%, rgba(10,10,15,0.7) 100%);
+            border-bottom: 1px solid var(--color-gold);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .header h1 {
+            font-family: "Noto Serif SC", "SimSun", serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--color-gold);
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .header .subtitle {
+            font-size: 12px;
+            color: rgba(232, 228, 217, 0.6);
+            font-family: "Noto Serif SC", serif;
+            letter-spacing: 1px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .help-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: transparent;
+            border: 1px solid var(--color-gold);
+            color: var(--color-gold);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: "Noto Serif SC", serif;
+        }
+
+        .help-btn:hover {
+            background: var(--color-gold);
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .control-panel {
+            position: fixed;
+            top: 92px;
+            right: 20px;
+            width: 300px;
+            background: var(--panel-bg);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            max-height: calc(100vh - 160px);
+            overflow-y: auto;
+        }
+
+        .control-panel.collapsed {
+            transform: translateX(340px);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .panel-toggle {
+            position: fixed;
+            top: 92px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            background: var(--panel-bg);
+            border: 1px solid var(--color-gold);
+            border-radius: 8px;
+            color: var(--color-gold);
+            cursor: pointer;
+            z-index: 101;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .panel-toggle.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .panel-toggle:hover {
+            background: var(--color-gold);
+            color: var(--bg-primary);
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-label {
+            display: block;
+            font-size: 12px;
+            color: var(--color-gold);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .control-value {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 11px;
+            color: rgba(232, 228, 217, 0.5);
+            float: right;
+        }
+
+        .slider-container {
+            position: relative;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(212, 175, 55, 0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--color-gold);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            transition: transform 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(10, 10, 15, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 6px;
+            color: var(--color-text);
+            font-family: "Noto Sans SC", sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        select:hover, select:focus {
+            border-color: var(--color-gold);
+        }
+
+        select option {
+            background: var(--bg-primary);
+            color: var(--color-text);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px 14px;
+            background: transparent;
+            border: 1px solid var(--color-gold);
+            border-radius: 6px;
+            color: var(--color-gold);
+            font-family: "Noto Sans SC", sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--color-gold);
+            color: var(--bg-primary);
+        }
+
+        .btn.active {
+            background: var(--color-gold);
+            color: var(--bg-primary);
+        }
+
+        .info-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 44px;
+            background: linear-gradient(0deg, var(--panel-bg) 0%, rgba(10,10,15,0.6) 100%);
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            z-index: 100;
+            font-size: 12px;
+            backdrop-filter: blur(8px);
+        }
+
+        .info-left {
+            display: flex;
+            gap: 24px;
+            color: rgba(232, 228, 217, 0.6);
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-item .label {
+            color: var(--color-gold);
+        }
+
+        .info-item .value {
+            font-family: "JetBrains Mono", monospace;
+            color: var(--color-text);
+        }
+
+        .info-right {
+            color: rgba(232, 228, 217, 0.4);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: var(--panel-bg);
+            border: 1px solid var(--color-gold);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 560px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 32px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.visible .modal {
+            transform: scale(1);
+        }
+
+        .modal h2 {
+            font-family: "Noto Serif SC", serif;
+            font-size: 22px;
+            color: var(--color-gold);
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .modal h3 {
+            font-size: 14px;
+            color: var(--color-gold);
+            margin: 20px 0 10px;
+            letter-spacing: 1px;
+        }
+
+        .modal p {
+            font-size: 14px;
+            line-height: 1.8;
+            color: rgba(232, 228, 217, 0.8);
+            margin-bottom: 12px;
+        }
+
+        .modal ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .modal li {
+            font-size: 13px;
+            line-height: 1.8;
+            color: rgba(232, 228, 217, 0.7);
+            padding-left: 20px;
+            position: relative;
+            margin-bottom: 6px;
+        }
+
+        .modal li::before {
+            content: "◆";
+            position: absolute;
+            left: 0;
+            color: var(--color-gold);
+            font-size: 8px;
+            top: 6px;
+        }
+
+        .modal kbd {
+            display: inline-block;
+            padding: 2px 8px;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 4px;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 11px;
+            color: var(--color-gold);
+            margin: 0 2px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            border-radius: 50%;
+            color: var(--color-gold);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--color-gold);
+            color: var(--bg-primary);
+        }
+
+        .philosophy-quote {
+            background: rgba(45, 90, 74, 0.2);
+            border-left: 3px solid var(--color-teal);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .philosophy-quote p {
+            font-family: "Noto Serif SC", serif;
+            font-size: 15px;
+            color: var(--color-text);
+            margin: 0;
+            font-style: italic;
+        }
+
+        .philosophy-quote .source {
+            font-size: 12px;
+            color: rgba(232, 228, 217, 0.5);
+            margin-top: 8px;
+            font-style: normal;
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-primary);
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-text {
+            font-family: "Noto Serif SC", serif;
+            font-size: 24px;
+            color: var(--color-gold);
+            letter-spacing: 8px;
+            margin-bottom: 24px;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 2px solid rgba(212, 175, 55, 0.2);
+            border-top-color: var(--color-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hint-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--panel-bg);
+            border: 1px solid var(--color-gold);
+            border-radius: 12px;
+            padding: 20px 28px;
+            z-index: 150;
+            text-align: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .hint-overlay.visible {
+            opacity: 1;
+        }
+
+        .hint-overlay h3 {
+            font-family: "Noto Serif SC", serif;
+            font-size: 16px;
+            color: var(--color-gold);
+            margin-bottom: 10px;
+        }
+
+        .hint-overlay p {
+            font-size: 13px;
+            color: rgba(232, 228, 217, 0.7);
+            margin: 4px 0;
+        }
+
+        .visualization-legend {
+            position: fixed;
+            top: 92px;
+            left: 20px;
+            background: var(--panel-bg);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            font-size: 12px;
+            min-width: 180px;
+        }
+
+        .legend-title {
+            font-family: "Noto Serif SC", serif;
+            font-size: 13px;
+            color: var(--color-gold);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            color: rgba(232, 228, 217, 0.7);
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 16px;
+                height: 60px;
+            }
+
+            .header h1 {
+                font-size: 18px;
+                letter-spacing: 2px;
+            }
+
+            .header .subtitle {
+                display: none;
+            }
+
+            .control-panel {
+                width: calc(100% - 32px);
+                right: 16px;
+                top: auto;
+                bottom: 64px;
+                border-radius: 12px 12px 0 0;
+                transform: translateY(0);
+            }
+
+            .control-panel.collapsed {
+                transform: translateY(100%);
+            }
+
+            .panel-toggle {
+                right: 16px;
+                bottom: 64px;
+                top: auto;
+            }
+
+            .info-bar {
+                padding: 0 16px;
+                height: 48px;
+            }
+
+            .info-left {
+                flex-direction: column;
+                gap: 2px;
+                font-size: 10px;
+            }
+
+            .visualization-legend {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">
+        <div class="loading-text">镜灯之阵</div>
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <header class="header">
+        <div class="header-left">
+            <h1>镜灯之阵</h1>
+            <span class="subtitle">法藏十镜无尽阵 · 华严法界缘起</span>
+        </div>
+        <div class="header-right">
+            <button class="help-btn" id="helpBtn">?</button>
+        </div>
+    </header>
+
+    <div class="visualization-legend" id="legend">
+        <div class="legend-title">光线可视化</div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ffdd88; box-shadow: 0 0 8px #ffdd88;"></div>
+            <span>主光源光线</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ff8844; box-shadow: 0 0 8px #ff8844;"></div>
+            <span>反射光线</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #d4af37;"></div>
+            <span>八角镜 (八方)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #2d5a4a;"></div>
+            <span>天地镜 (上下)</span>
+        </div>
+    </div>
+
+    <button class="panel-toggle" id="panelToggle">☰</button>
+    <div class="control-panel" id="controlPanel">
+        <div class="control-group">
+            <label class="control-label">
+                光源强度
+                <span class="control-value" id="lightValue">70%</span>
+            </label>
+            <div class="slider-container">
+                <input type="range" id="lightSlider" min="0" max="100" value="70">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                反射层级
+                <span class="control-value" id="bounceValue">6</span>
+            </label>
+            <div class="slider-container">
+                <input type="range" id="bounceSlider" min="2" max="20" value="6">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                光线动画速度
+                <span class="control-value" id="raySpeedValue">1.0x</span>
+            </label>
+            <div class="slider-container">
+                <input type="range" id="raySpeedSlider" min="1" max="30" value="10">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">光线可视化</label>
+            <div class="btn-row">
+                <button class="btn" id="rayToggleBtn">显示光线</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">中心参照物</label>
+            <select id="objectSelect">
+                <option value="buddha">佛像</option>
+                <option value="lotus">莲花</option>
+                <option value="sphere">舍利（发光球体）</option>
+                <option value="dodecahedron">十二面体</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">视角控制</label>
+            <div class="btn-row">
+                <button class="btn" id="resetBtn">重置视角</button>
+                <button class="btn" id="autoRotateBtn">自动旋转</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="btn-row">
+                <button class="btn" id="fullscreenBtn">全屏</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-bar">
+        <div class="info-left">
+            <div class="info-item">
+                <span class="label">反射层级:</span>
+                <span class="value" id="infoBounce">6</span>
+            </div>
+            <div class="info-item">
+                <span class="label">FPS:</span>
+                <span class="value" id="infoFps">60</span>
+            </div>
+            <div class="info-item">
+                <span class="label">光线:</span>
+                <span class="value" id="infoRays">关闭</span>
+            </div>
+        </div>
+        <div class="info-right">
+            拖拽旋转 · 滚轮缩放 · 按 H 查看帮助
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal" style="position: relative;">
+            <button class="modal-close" id="modalClose">×</button>
+            <h2>操作指南</h2>
+
+            <h3>鼠标操作</h3>
+            <ul>
+                <li>左键拖拽：旋转视角</li>
+                <li>滚轮：缩放场景</li>
+                <li>右键拖拽：平移视角</li>
+            </ul>
+
+            <h3>键盘快捷键</h3>
+            <ul>
+                <li><kbd>R</kbd> 重置视角</li>
+                <li><kbd>F</kbd> 切换全屏</li>
+                <li><kbd>H</kbd> 显示/隐藏帮助</li>
+                <li><kbd>空格</kbd> 暂停/继续自动旋转</li>
+                <li><kbd>T</kbd> 切换光线可视化</li>
+                <li><kbd>1-4</kbd> 快速切换参照物</li>
+            </ul>
+
+            <div class="philosophy-quote">
+                <p>「一佛现万佛，一灯含万灯，刹海涉入无尽」</p>
+                <div class="source">——《华严经》法界缘起</div>
+            </div>
+
+            <h3>关于镜灯之阵</h3>
+            <p>唐长安年间（公元701年），华严宗三祖法藏大师于洛阳宫中，为武则天演示「十镜」光影阵法，以十面铜镜八方相对、中央设佛成像，镜镜互映，展现「重重无尽」之境，直观诠释华严「法界缘起」哲思。</p>
+
+            <h3>效果说明</h3>
+            <p>点击「显示光线」按钮，可观察光线从中心光源出发，经镜面反射向四面八方传播的动态路径。这有助于理解「重重无尽」的光学原理。</p>
+            
+            <h3>优化说明</h3>
+            <p>本模拟器已优化性能，降低默认反射层级以保证流畅运行。可通过滑块调整反射层级（2-12），层级越高视觉效果越丰富，但性能开销越大。</p>
+        </div>
+    </div>
+
+    <div class="hint-overlay" id="hintOverlay">
+        <h3>镜阵结构</h3>
+        <p>8面八角镜环绕中心</p>
+        <p>上下各1面天地镜</p>
+        <p>共10面铜镜组成无尽阵</p>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { Reflector } from 'three/addons/objects/Reflector.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+        let scene, camera, renderer, controls, composer;
+        let mirrors = [];
+        let mirrorReflectors = [];
+        let centerObject;
+        let lightSource;
+        let autoRotate = false;
+        let clock = new THREE.Clock();
+        let frameCount = 0;
+        let lastFpsUpdate = 0;
+        let reflectionLayers = 6;
+        
+        // 光线可视化
+        let rayLines = [];
+        let rayParticles = [];
+        let showRays = false;
+        let raySpeed = 1.0;
+        
+        // 镜子位置数据
+        const mirrorPositions = [];
+
+        // 镜面配置 - 严格按照史料参数
+        const mirrorConfig = {
+            // 8面水平镜（八方）- 对应华严"八方"
+            east: { pos: new THREE.Vector3(1.75, 0, 0), rot: new THREE.Euler(0, Math.PI / 2, 0), name: '正东' },
+            west: { pos: new THREE.Vector3(-1.75, 0, 0), rot: new THREE.Euler(0, -Math.PI / 2, 0), name: '正西' },
+            north: { pos: new THREE.Vector3(0, 1.75, 0), rot: new THREE.Euler(0, 0, 0), name: '正北' },
+            south: { pos: new THREE.Vector3(0, -1.75, 0), rot: new THREE.Euler(0, Math.PI, 0), name: '正南' },
+            northeast: { pos: new THREE.Vector3(1.237, 1.237, 0), rot: new THREE.Euler(0, -Math.PI * 3 / 4, 0), name: '东北' },
+            southwest: { pos: new THREE.Vector3(-1.237, -1.237, 0), rot: new THREE.Euler(0, Math.PI * 3 / 4, 0), name: '西南' },
+            southeast: { pos: new THREE.Vector3(1.237, -1.237, 0), rot: new THREE.Euler(0, Math.PI / 4, 0), name: '东南' },
+            northwest: { pos: new THREE.Vector3(-1.237, 1.237, 0), rot: new THREE.Euler(0, -Math.PI / 4, 0), name: '西北' },
+            // 2面垂直镜（天地）- 对应华严"天圆地方"
+            top: { pos: new THREE.Vector3(0, 0, 1.75), rot: new THREE.Euler(Math.PI / 2, 0, 0), name: '天' },
+            bottom: { pos: new THREE.Vector3(0, 0, -1.75), rot: new THREE.Euler(-Math.PI / 2, 0, 0), name: '地' }
+        };
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x050508);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 1000);
+            camera.position.set(3, 2, 3);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.0;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 0.8;
+            controls.maxDistance = 8;
+            controls.target.set(0, 0.2, 0);
+
+            createDarkRoom();
+            createMirrors();
+            createCenterObject('buddha');
+            createLight();
+            createRayVisualization();
+            setupPostProcessing();
+            setupEventListeners();
+
+            animate();
+
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+            }, 1500);
+
+            // 显示提示
+            setTimeout(() => {
+                const hint = document.getElementById('hintOverlay');
+                hint.classList.add('visible');
+                setTimeout(() => {
+                    hint.classList.remove('visible');
+                }, 5000);
+            }, 2000);
+        }
+
+        function createDarkRoom() {
+            const roomSize = 12;
+
+            // 墙面 - 使用微弱的灰色让暗室可见
+            const wallMaterial = new THREE.MeshStandardMaterial({
+                color: 0x0a0a10,
+                roughness: 0.95,
+                metalness: 0.0,
+                side: THREE.BackSide
+            });
+
+            const roomGeometry = new THREE.BoxGeometry(roomSize, roomSize, roomSize);
+            const room = new THREE.Mesh(roomGeometry, wallMaterial);
+            room.position.y = 0;
+            scene.add(room);
+
+            // 地面 - 微暗但可见
+            const floorGeometry = new THREE.PlaneGeometry(roomSize - 0.1, roomSize - 0.1);
+            const floorMaterial = new THREE.MeshStandardMaterial({
+                color: 0x0a0a12,
+                roughness: 0.92,
+                metalness: 0.05
+            });
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.rotation.x = -Math.PI / 2;
+            floor.position.y = -roomSize / 2 + 0.01;
+            floor.receiveShadow = true;
+            scene.add(floor);
+            
+            // 添加网格辅助线帮助理解空间
+            const gridHelper = new THREE.GridHelper(roomSize * 0.8, 20, 0x1a1a25, 0x151520);
+            gridHelper.position.y = -roomSize / 2 + 0.02;
+            scene.add(gridHelper);
+        }
+
+        function createMirrors() {
+            const mirrorSize = 0.5;
+            
+            // 镜面反射率颜色 - 稍微偏暖
+            const mirrorColor = 0xffeedd;
+
+            Object.keys(mirrorConfig).forEach(key => {
+                const config = mirrorConfig[key];
+                
+                // 保存镜子位置信息用于光线可视化
+                mirrorPositions.push({
+                    key: key,
+                    pos: config.pos.clone(),
+                    rot: config.rot.clone(),
+                    name: config.name
+                });
+
+                // 使用Reflector实现真实平面反射
+                const mirrorGeometry = new THREE.PlaneGeometry(mirrorSize, mirrorSize);
+
+                // 优化：使用较小的纹理尺寸以提高性能
+                const textureSize = Math.min(512, Math.max(256, window.innerWidth / 4));
+                
+                const reflector = new Reflector(mirrorGeometry, {
+                    clipBias: 0.003,
+                    textureWidth: textureSize * renderer.getPixelRatio(),
+                    textureHeight: textureSize * renderer.getPixelRatio(),
+                    color: mirrorColor,
+                    recursion: reflectionLayers
+                });
+
+                reflector.position.copy(config.pos);
+                reflector.rotation.copy(config.rot);
+
+                // 添加更明显的金色边框
+                const frameGeometry = new THREE.BoxGeometry(mirrorSize + 0.06, mirrorSize + 0.06, 0.02);
+                const frameMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xd4af37,
+                    metalness: 0.85,
+                    roughness: 0.3,
+                    emissive: 0x332200,
+                    emissiveIntensity: 0.15
+                });
+                const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+                frame.position.z = -0.012;
+                reflector.add(frame);
+
+                // 边框装饰 - 角落细节
+                const corners = [
+                    [mirrorSize/2 + 0.025, mirrorSize/2 + 0.025],
+                    [-mirrorSize/2 - 0.025, mirrorSize/2 + 0.025],
+                    [mirrorSize/2 + 0.025, -mirrorSize/2 - 0.025],
+                    [-mirrorSize/2 - 0.025, -mirrorSize/2 - 0.025]
+                ];
+
+                corners.forEach(([x, y]) => {
+                    const cornerGeom = new THREE.SphereGeometry(0.015, 12, 12);
+                    const corner = new THREE.Mesh(cornerGeom, frameMaterial);
+                    corner.position.set(x, y, -0.012);
+                    reflector.add(corner);
+                });
+                
+                // 添加镜子标签
+                const isCardinal = ['east', 'west', 'north', 'south'].includes(key);
+                const isVertical = ['top', 'bottom'].includes(key);
+                
+                // 镜子标签（使用发光材质的小球标记）
+                const markerGeom = new THREE.SphereGeometry(0.025, 16, 16);
+                const markerMat = new THREE.MeshBasicMaterial({
+                    color: isCardinal ? 0xd4af37 : (isVertical ? 0x2d5a4a : 0xb8860b)
+                });
+                const marker = new THREE.Mesh(markerGeom, markerMat);
+                marker.position.set(0, mirrorSize/2 + 0.05, 0);
+                reflector.add(marker);
+
+                mirrors.push({ reflector, key, config });
+                scene.add(reflector);
+                mirrorReflectors.push(reflector);
+            });
+        }
+
+        function createCenterObject(type) {
+            if (centerObject) {
+                scene.remove(centerObject);
+            }
+
+            const group = new THREE.Group();
+
+            switch(type) {
+                case 'buddha':
+                    // 佛像身体
+                    const bodyGeom = new THREE.CylinderGeometry(0.1, 0.14, 0.32, 32);
+                    const bodyMat = new THREE.MeshStandardMaterial({
+                        color: 0xd4af37,
+                        metalness: 0.75,
+                        roughness: 0.25,
+                        emissive: 0x221100,
+                        emissiveIntensity: 0.1
+                    });
+                    const body = new THREE.Mesh(bodyGeom, bodyMat);
+                    body.position.y = 0.16;
+                    body.castShadow = true;
+                    group.add(body);
+
+                    // 佛首
+                    const headGeom = new THREE.SphereGeometry(0.09, 32, 32);
+                    const head = new THREE.Mesh(headGeom, bodyMat);
+                    head.position.y = 0.38;
+                    head.scale.y = 1.1;
+                    head.castShadow = true;
+                    group.add(head);
+
+                    // 髻
+                    const ushnishaGeom = new THREE.SphereGeometry(0.05, 16, 16);
+                    const ushnisha = new THREE.Mesh(ushnishaGeom, bodyMat);
+                    ushnisha.position.y = 0.47;
+                    group.add(ushnisha);
+
+                    // 光环 - 更明显
+                    const haloGeom = new THREE.TorusGeometry(0.15, 0.012, 16, 64);
+                    const haloMat = new THREE.MeshBasicMaterial({
+                        color: 0xffdd88,
+                        transparent: true,
+                        opacity: 0.8
+                    });
+                    const halo = new THREE.Mesh(haloGeom, haloMat);
+                    halo.position.y = 0.38;
+                    halo.rotation.x = Math.PI / 2;
+                    group.add(halo);
+                    
+                    // 第二层光环
+                    const halo2Geom = new THREE.TorusGeometry(0.2, 0.006, 16, 64);
+                    const halo2Mat = new THREE.MeshBasicMaterial({
+                        color: 0xffaa55,
+                        transparent: true,
+                        opacity: 0.5
+                    });
+                    const halo2 = new THREE.Mesh(halo2Geom, halo2Mat);
+                    halo2.position.y = 0.38;
+                    halo2.rotation.x = Math.PI / 2;
+                    group.add(halo2);
+
+                    // 底座
+                    const baseGeom = new THREE.CylinderGeometry(0.18, 0.22, 0.06, 32);
+                    const baseMat = new THREE.MeshStandardMaterial({
+                        color: 0x6b4423,
+                        metalness: 0.4,
+                        roughness: 0.6
+                    });
+                    const base = new THREE.Mesh(baseGeom, baseMat);
+                    base.position.y = 0.03;
+                    base.castShadow = true;
+                    group.add(base);
+                    break;
+
+                case 'lotus':
+                    const petalCount = 16;
+                    const colors = [0xffb7c5, 0xffc0cb, 0xffd1dc, 0xffe4e8];
+
+                    for (let i = 0; i < petalCount; i++) {
+                        const petalGeom = new THREE.PlaneGeometry(0.12, 0.22);
+                        const petalMat = new THREE.MeshStandardMaterial({
+                            color: colors[i % colors.length],
+                            metalness: 0.1,
+                            roughness: 0.6,
+                            side: THREE.DoubleSide,
+                            transparent: true,
+                            opacity: 0.9,
+                            emissive: 0x221111,
+                            emissiveIntensity: 0.05
+                        });
+                        const petal = new THREE.Mesh(petalGeom, petalMat);
+                        const angle = (i / petalCount) * Math.PI * 2;
+                        const radius = 0.06 + Math.random() * 0.04;
+                        petal.position.set(
+                            Math.cos(angle) * radius,
+                            0.1 + Math.random() * 0.05,
+                            Math.sin(angle) * radius
+                        );
+                        petal.rotation.x = -Math.PI / 3 - Math.random() * 0.2;
+                        petal.rotation.y = angle + Math.PI / 2;
+                        group.add(petal);
+                    }
+
+                    // 莲蓬
+                    const centerGeom = new THREE.SphereGeometry(0.07, 24, 24);
+                    const centerMat = new THREE.MeshStandardMaterial({
+                        color: 0xffb347,
+                        metalness: 0.2,
+                        roughness: 0.5,
+                        emissive: 0x331100,
+                        emissiveIntensity: 0.1
+                    });
+                    const lotusCenter = new THREE.Mesh(centerGeom, centerMat);
+                    lotusCenter.position.y = 0.1;
+                    lotusCenter.scale.y = 0.7;
+                    group.add(lotusCenter);
+
+                    // 底座
+                    const lotusBaseGeom = new THREE.CylinderGeometry(0.18, 0.2, 0.04, 32);
+                    const lotusBaseMat = new THREE.MeshStandardMaterial({
+                        color: 0x2d5a4a,
+                        metalness: 0.2,
+                        roughness: 0.8
+                    });
+                    const lotusBase = new THREE.Mesh(lotusBaseGeom, lotusBaseMat);
+                    lotusBase.position.y = 0.02;
+                    group.add(lotusBase);
+                    break;
+
+                case 'sphere':
+                    // 发光舍利 - 更亮
+                    const sphereGeom = new THREE.SphereGeometry(0.12, 64, 64);
+                    const sphereMat = new THREE.MeshStandardMaterial({
+                        color: 0xffd700,
+                        metalness: 0.95,
+                        roughness: 0.05,
+                        emissive: 0xff8800,
+                        emissiveIntensity: 0.8
+                    });
+                    const sphere = new THREE.Mesh(sphereGeom, sphereMat);
+                    sphere.position.y = 0.18;
+                    sphere.castShadow = true;
+                    group.add(sphere);
+
+                    // 多层光晕 - 更明显
+                    for (let i = 0; i < 4; i++) {
+                        const glowGeom = new THREE.SphereGeometry(0.14 + i * 0.05, 32, 32);
+                        const glowMat = new THREE.MeshBasicMaterial({
+                            color: 0xffaa00,
+                            transparent: true,
+                            opacity: 0.3 - i * 0.07
+                        });
+                        const glow = new THREE.Mesh(glowGeom, glowMat);
+                        glow.position.y = 0.18;
+                        group.add(glow);
+                    }
+
+                    // 底座
+                    const sphereBaseGeom = new THREE.CylinderGeometry(0.12, 0.15, 0.08, 32);
+                    const sphereBaseMat = new THREE.MeshStandardMaterial({
+                        color: 0x6b4423,
+                        metalness: 0.4,
+                        roughness: 0.6
+                    });
+                    const sphereBase = new THREE.Mesh(sphereBaseGeom, sphereBaseMat);
+                    sphereBase.position.y = 0.04;
+                    group.add(sphereBase);
+                    break;
+
+                case 'dodecahedron':
+                    // 十二面体
+                    const dodecaGeom = new THREE.DodecahedronGeometry(0.16);
+                    const dodecaMat = new THREE.MeshStandardMaterial({
+                        color: 0xd4af37,
+                        metalness: 0.85,
+                        roughness: 0.15,
+                        emissive: 0x554400,
+                        emissiveIntensity: 0.25
+                    });
+                    const dodeca = new THREE.Mesh(dodecaGeom, dodecaMat);
+                    dodeca.position.y = 0.22;
+                    dodeca.castShadow = true;
+                    group.add(dodeca);
+
+                    // 旋转环
+                    const ringGeom = new THREE.TorusGeometry(0.25, 0.012, 16, 64);
+                    const ringMat = new THREE.MeshStandardMaterial({
+                        color: 0xb8860b,
+                        metalness: 0.9,
+                        roughness: 0.2,
+                        emissive: 0x332200,
+                        emissiveIntensity: 0.1
+                    });
+
+                    for (let i = 0; i < 3; i++) {
+                        const ring = new THREE.Mesh(ringGeom, ringMat);
+                        ring.position.y = 0.22;
+                        ring.rotation.x = Math.PI / 2 + i * 0.5;
+                        ring.rotation.z = i * 0.8;
+                        group.add(ring);
+                    }
+
+                    // 底座
+                    const dodecaBaseGeom = new THREE.CylinderGeometry(0.15, 0.18, 0.06, 5);
+                    const dodecaBaseMat = new THREE.MeshStandardMaterial({
+                        color: 0x2d5a4a,
+                        metalness: 0.2,
+                        roughness: 0.8
+                    });
+                    const dodecaBase = new THREE.Mesh(dodecaBaseGeom, dodecaBaseMat);
+                    dodecaBase.position.y = 0.03;
+                    group.add(dodecaBase);
+                    break;
+            }
+
+            centerObject = group;
+            scene.add(centerObject);
+        }
+
+        function createLight() {
+            // 微弱的环境光 - 让暗室可见
+            const ambientLight = new THREE.AmbientLight(0x1a1a25, 0.25);
+            scene.add(ambientLight);
+
+            // 中心点光源 - 暖橙色烛光
+            lightSource = new THREE.PointLight(0xffaa55, 80, 8);
+            lightSource.position.set(0, 0.45, 0);
+            lightSource.castShadow = true;
+            lightSource.shadow.mapSize.width = 512;
+            lightSource.shadow.mapSize.height = 512;
+            lightSource.shadow.bias = -0.001;
+            lightSource.shadow.radius = 4;
+            scene.add(lightSource);
+
+            // 光源发光点 - 更明显
+            const lightSphereGeom = new THREE.SphereGeometry(0.025, 16, 16);
+            const lightSphereMat = new THREE.MeshBasicMaterial({
+                color: 0xffdd99
+            });
+            const lightSphere = new THREE.Mesh(lightSphereGeom, lightSphereMat);
+            lightSphere.position.copy(lightSource.position);
+            lightSphere.name = 'lightSphere';
+            scene.add(lightSphere);
+            
+            // 光源外层光晕
+            const glowGeom = new THREE.SphereGeometry(0.06, 16, 16);
+            const glowMat = new THREE.MeshBasicMaterial({
+                color: 0xffaa44,
+                transparent: true,
+                opacity: 0.3
+            });
+            const lightGlow = new THREE.Mesh(glowGeom, glowMat);
+            lightGlow.position.copy(lightSource.position);
+            lightGlow.name = 'lightGlow';
+            scene.add(lightGlow);
+
+            // 次级补光 - 让边缘可见
+            const fillLight = new THREE.PointLight(0xff8844, 15, 4);
+            fillLight.position.set(0, 0.1, 0);
+            scene.add(fillLight);
+        }
+
+        function createRayVisualization() {
+            // 从光源到每面镜子的光线
+            const rayMaterial = new THREE.LineBasicMaterial({
+                color: 0xffdd88,
+                transparent: true,
+                opacity: 0.6
+            });
+            
+            const particleMaterial = new THREE.PointsMaterial({
+                color: 0xffdd88,
+                size: 0.03,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            // 为每面镜子创建光线
+            mirrorPositions.forEach((mirror, index) => {
+                const startPos = new THREE.Vector3(0, 0.45, 0); // 光源位置
+                const endPos = mirror.pos.clone(); // 镜子位置
+                
+                // 主光线
+                const points = [startPos, endPos];
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const line = new THREE.Line(geometry, rayMaterial.clone());
+                line.visible = false;
+                scene.add(line);
+                rayLines.push({
+                    line: line,
+                    start: startPos,
+                    end: endPos,
+                    progress: Math.random(), // 随机起始位置
+                    mirror: mirror
+                });
+                
+                // 反射光线 - 向外延伸
+                const reflectionDir = mirror.pos.clone().normalize();
+                const reflectionEnd = mirror.pos.clone().add(reflectionDir.multiplyScalar(1.5));
+                const reflectionPoints = [mirror.pos.clone(), reflectionEnd];
+                const reflectionGeometry = new THREE.BufferGeometry().setFromPoints(reflectionPoints);
+                const reflectionLine = new THREE.Line(reflectionGeometry, new THREE.LineBasicMaterial({
+                    color: 0xff8844,
+                    transparent: true,
+                    opacity: 0.5
+                }));
+                reflectionLine.visible = false;
+                scene.add(reflectionLine);
+                rayLines.push({
+                    line: reflectionLine,
+                    start: mirror.pos.clone(),
+                    end: reflectionEnd,
+                    progress: 0,
+                    isReflection: true,
+                    mirror: mirror
+                });
+            });
+            
+            // 添加粒子效果
+            const particleCount = 50;
+            const particleGeometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            
+            for (let i = 0; i < particleCount; i++) {
+                const mirror = mirrorPositions[i % mirrorPositions.length];
+                const t = Math.random();
+                positions[i * 3] = mirror.pos.x * t;
+                positions[i * 3 + 1] = 0.45 * (1 - t) + mirror.pos.y * t;
+                positions[i * 3 + 2] = mirror.pos.z * t;
+            }
+            
+            particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const particles = new THREE.Points(particleGeometry, particleMaterial);
+            particles.visible = false;
+            particles.name = 'rayParticles';
+            scene.add(particles);
+            rayParticles.push(particles);
+        }
+
+        function updateRayVisualization(delta) {
+            if (!showRays) return;
+            
+            const speed = delta * raySpeed;
+            
+            rayLines.forEach((ray, index) => {
+                ray.progress += speed;
+                if (ray.progress > 1) ray.progress = 0;
+                
+                const points = [];
+                if (ray.isReflection) {
+                    // 反射光线动画
+                    const t = ray.progress;
+                    const start = ray.start.clone();
+                    const end = ray.end.clone();
+                    const current = start.clone().lerp(end, t);
+                    points.push(ray.start.clone());
+                    points.push(current);
+                } else {
+                    // 主光线动画
+                    const t = ray.progress;
+                    const current = ray.start.clone().lerp(ray.end, t);
+                    points.push(ray.start.clone());
+                    points.push(current);
+                }
+                
+                ray.line.geometry.setFromPoints(points);
+            });
+            
+            // 更新粒子
+            const particles = scene.getObjectByName('rayParticles');
+            if (particles) {
+                const positions = particles.geometry.attributes.position.array;
+                const time = clock.getElapsedTime() * raySpeed;
+                
+                for (let i = 0; i < positions.length / 3; i++) {
+                    const mirror = mirrorPositions[i % mirrorPositions.length];
+                    const t = (Math.sin(time + i * 0.5) + 1) / 2;
+                    positions[i * 3] = mirror.pos.x * t;
+                    positions[i * 3 + 1] = 0.45 * (1 - t) + mirror.pos.y * t;
+                    positions[i * 3 + 2] = mirror.pos.z * t;
+                }
+                
+                particles.geometry.attributes.position.needsUpdate = true;
+            }
+        }
+
+        function toggleRays() {
+            showRays = !showRays;
+            
+            rayLines.forEach(ray => {
+                ray.line.visible = showRays;
+            });
+            
+            rayParticles.forEach(p => {
+                p.visible = showRays;
+            });
+            
+            document.getElementById('infoRays').textContent = showRays ? '开启' : '关闭';
+            document.getElementById('rayToggleBtn').classList.toggle('active', showRays);
+        }
+
+        function setupPostProcessing() {
+            composer = new EffectComposer(renderer);
+
+            const renderPass = new RenderPass(scene, camera);
+            composer.addPass(renderPass);
+
+            // Bloom效果 - 模拟烛光泛光
+            const bloomPass = new UnrealBloomPass(
+                new THREE.Vector2(window.innerWidth, window.innerHeight),
+                0.8,
+                0.4,
+                0.85
+            );
+            composer.addPass(bloomPass);
+
+            const outputPass = new OutputPass();
+            composer.addPass(outputPass);
+        }
+
+        function setupEventListeners() {
+            window.addEventListener('resize', onWindowResize);
+
+            const lightSlider = document.getElementById('lightSlider');
+            lightSlider.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                const intensity = (value / 100) * 100;
+                lightSource.intensity = intensity;
+                document.getElementById('lightValue').textContent = value + '%';
+            });
+
+            const bounceSlider = document.getElementById('bounceSlider');
+            bounceSlider.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                reflectionLayers = value;
+                document.getElementById('bounceValue').textContent = value;
+                document.getElementById('infoBounce').textContent = value;
+                updateMirrorReflections();
+            });
+            
+            const raySpeedSlider = document.getElementById('raySpeedSlider');
+            raySpeedSlider.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                raySpeed = value / 10;
+                document.getElementById('raySpeedValue').textContent = raySpeed.toFixed(1) + 'x';
+            });
+
+            const objectSelect = document.getElementById('objectSelect');
+            objectSelect.addEventListener('change', (e) => {
+                createCenterObject(e.target.value);
+            });
+
+            document.getElementById('resetBtn').addEventListener('click', resetCamera);
+
+            const autoRotateBtn = document.getElementById('autoRotateBtn');
+            autoRotateBtn.addEventListener('click', () => {
+                autoRotate = !autoRotate;
+                autoRotateBtn.classList.toggle('active', autoRotate);
+            });
+            
+            document.getElementById('rayToggleBtn').addEventListener('click', toggleRays);
+
+            document.getElementById('fullscreenBtn').addEventListener('click', toggleFullscreen);
+
+            document.getElementById('helpBtn').addEventListener('click', () => {
+                document.getElementById('helpModal').classList.add('visible');
+            });
+
+            document.getElementById('modalClose').addEventListener('click', () => {
+                document.getElementById('helpModal').classList.remove('visible');
+            });
+
+            document.getElementById('helpModal').addEventListener('click', (e) => {
+                if (e.target.id === 'helpModal') {
+                    document.getElementById('helpModal').classList.remove('visible');
+                }
+            });
+
+            const panelToggle = document.getElementById('panelToggle');
+            const controlPanel = document.getElementById('controlPanel');
+            panelToggle.addEventListener('click', () => {
+                controlPanel.classList.toggle('collapsed');
+                panelToggle.classList.toggle('visible', controlPanel.classList.contains('collapsed'));
+            });
+
+            document.addEventListener('keydown', (e) => {
+                switch(e.key.toLowerCase()) {
+                    case 'r':
+                        resetCamera();
+                        break;
+                    case 'f':
+                        toggleFullscreen();
+                        break;
+                    case 'h':
+                        document.getElementById('helpModal').classList.toggle('visible');
+                        break;
+                    case ' ':
+                        e.preventDefault();
+                        autoRotate = !autoRotate;
+                        document.getElementById('autoRotateBtn').classList.toggle('active', autoRotate);
+                        break;
+                    case 't':
+                        toggleRays();
+                        break;
+                    case '1':
+                        document.getElementById('objectSelect').value = 'buddha';
+                        createCenterObject('buddha');
+                        break;
+                    case '2':
+                        document.getElementById('objectSelect').value = 'lotus';
+                        createCenterObject('lotus');
+                        break;
+                    case '3':
+                        document.getElementById('objectSelect').value = 'sphere';
+                        createCenterObject('sphere');
+                        break;
+                    case '4':
+                        document.getElementById('objectSelect').value = 'dodecahedron';
+                        createCenterObject('dodecahedron');
+                        break;
+                }
+            });
+        }
+
+        function updateMirrorReflections() {
+            // 更新所有镜面的反射层级
+            mirrorReflectors.forEach(reflector => {
+                if (reflector.material && reflector.material.recursion !== undefined) {
+                    reflector.material.recursion = reflectionLayers;
+                }
+            });
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+
+            // 更新反射器尺寸
+            const textureSize = Math.min(512, Math.max(256, window.innerWidth / 4));
+            mirrorReflectors.forEach(reflector => {
+                reflector.getRenderTarget().setSize(
+                    textureSize * renderer.getPixelRatio(),
+                    textureSize * renderer.getPixelRatio()
+                );
+            });
+        }
+
+        function resetCamera() {
+            camera.position.set(3, 2, 3);
+            controls.target.set(0, 0.2, 0);
+            controls.update();
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+
+            if (autoRotate) {
+                const radius = Math.sqrt(camera.position.x ** 2 + camera.position.z ** 2);
+                const angle = delta * 0.25;
+                const newX = camera.position.x * Math.cos(angle) - camera.position.z * Math.sin(angle);
+                const newZ = camera.position.x * Math.sin(angle) + camera.position.z * Math.cos(angle);
+                camera.position.x = newX;
+                camera.position.z = newZ;
+                camera.lookAt(controls.target);
+            }
+
+            controls.update();
+
+            if (centerObject) {
+                centerObject.rotation.y += delta * 0.15;
+            }
+            
+            // 更新光源光晕
+            const lightGlow = scene.getObjectByName('lightGlow');
+            if (lightGlow) {
+                const pulse = 1 + Math.sin(clock.getElapsedTime() * 2) * 0.1;
+                lightGlow.scale.setScalar(pulse);
+            }
+
+            // 更新光线可视化
+            updateRayVisualization(delta);
+
+            composer.render();
+
+            frameCount++;
+            const now = performance.now();
+            if (now - lastFpsUpdate > 1000) {
+                document.getElementById('infoFps').textContent = frameCount;
+                frameCount = 0;
+                lastFpsUpdate = now;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
