@@ -221,8 +221,8 @@
             justify-content: center;
             font-size: 20px;
             transition: all 0.3s ease;
-            opacity: 0;
-            pointer-events: none;
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .panel-toggle.visible {
@@ -248,7 +248,9 @@
             color: var(--color-gold);
             cursor: pointer;
             font-size: 20px;
-            z-index: 99;
+            z-index: 102;
+            opacity: 1;
+            pointer-events: auto;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
@@ -862,21 +864,34 @@
             <button class="modal-close" id="modalClose">×</button>
             <h2>操作指南</h2>
 
-            <h3>鼠标操作</h3>
+            <h3>背景介绍</h3>
+            <p>「镜灯之阵」源自唐代华严宗法藏大师的宗教哲学实践。据《华严经》记载，法藏大师于武则天时期，在洛阳宫中以十面铜镜布置「无尽阵」：八面八角镜环绕八方，上下各置天地镜，中心供奉佛像。镜镜相映，光光迭照，形成「重重无尽」的视觉效果，直观呈现华严宗「法界缘起」的核心哲理——「一佛现万佛，一灯含万灯，刹海涉入无尽」。</p>
+
+            <h3>鼠标/触控操作</h3>
             <ul>
-                <li>左键拖拽：旋转视角</li>
-                <li>滚轮：缩放场景</li>
-                <li>右键拖拽：平移视角</li>
+                <li>左键拖拽 / 单指滑动：旋转视角</li>
+                <li>滚轮 / 双指捏合：缩放场景</li>
+                <li>右键拖拽 / 双指滑动：平移视角</li>
             </ul>
 
-            <h3>键盘快捷键</h3>
+            <h3>控制面板功能</h3>
+            <ul>
+                <li><strong>光源强度</strong>：调节中心佛像发光亮度（0-100%）</li>
+                <li><strong>反射层级</strong>：控制光线反射次数（2-12），层级越高光影越丰富</li>
+                <li><strong>自动旋转</strong>：开启后视角自动缓慢旋转展示</li>
+                <li><strong>显示光线</strong>：显示光线从中心向镜面传播的可视化路径</li>
+                <li><strong>显示网格</strong>：显示地面参考网格</li>
+                <li><strong>背景音乐</strong>：🎵 按钮可播放「空音自在 - 南无阿弥陀佛」佛乐</li>
+            </ul>
+
+            <h3>快捷键</h3>
             <ul>
                 <li><kbd>R</kbd> 重置视角</li>
                 <li><kbd>F</kbd> 切换全屏</li>
                 <li><kbd>H</kbd> 显示/隐藏帮助</li>
                 <li><kbd>空格</kbd> 暂停/继续自动旋转</li>
                 <li><kbd>T</kbd> 切换光线可视化</li>
-                <li><kbd>1-4</kbd> 快速切换参照物</li>
+                <li><kbd>1-4</kbd> 快速切换视角参照物</li>
             </ul>
 
             <div class="philosophy-quote">
@@ -884,14 +899,18 @@
                 <div class="source">——《华严经》法界缘起</div>
             </div>
 
-            <h3>关于镜灯之阵</h3>
-            <p>唐长安年间（公元701年），华严宗三祖法藏大师于洛阳宫中，为武则天演示「十镜」光影阵法，以十面铜镜八方相对、中央设佛成像，镜镜互映，展现「重重无尽」之境，直观诠释华严「法界缘起」哲思。</p>
-
-            <h3>效果说明</h3>
-            <p>点击「显示光线」按钮，可观察光线从中心光源出发，经镜面反射向四面八方传播的动态路径。这有助于理解「重重无尽」的光学原理。</p>
+            <h3>阵型说明</h3>
+            <p>本模拟器按照法藏十镜无尽阵复原：</p>
+            <ul>
+                <li>8面 <strong>八角镜</strong>：环绕中心，呈八角形排列</li>
+                <li>1面 <strong>天镜</strong>：位于上方，垂直俯照</li>
+                <li>1面 <strong>地镜</strong>：位于下方，垂直仰映</li>
+                <li>1座 <strong>佛像</strong>：位于中央，作为光源</li>
+            </ul>
+            <p>共10面铜镜组成「十镜」矩阵，镜镜相映，形成无限延伸的重重影像。</p>
             
-            <h3>优化说明</h3>
-            <p>本模拟器已优化性能，降低默认反射层级以保证流畅运行。可通过滑块调整反射层级（2-12），层级越高视觉效果越丰富，但性能开销越大。</p>
+            <h3>性能提示</h3>
+            <p>默认反射层级为4级，兼顾视觉效果与流畅度。可在控制面板中调整（2-12级），层级越高光影越绚丽，但设备性能要求越高。</p>
         </div>
     </div>
 
