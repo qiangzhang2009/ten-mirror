@@ -1154,21 +1154,22 @@
                     const frontTexture = textureLoader.load('53-3-Q版-大日如來.png');
                     const backTexture = textureLoader.load('53-4-Q版-大日如來.png');
                     
-                    // 佛像材质 - 使用图片纹理
+                    // 佛像材质 - 提高发光强度使其更清晰可见
                     const buddhaMat = new THREE.MeshStandardMaterial({
                         map: frontTexture,
-                        metalness: 0.3,
-                        roughness: 0.6,
-                        emissive: 0x221100,
-                        emissiveIntensity: 0.15
+                        metalness: 0.2,
+                        roughness: 0.5,
+                        emissive: 0xffaa44,
+                        emissiveIntensity: 0.8,
+                        side: THREE.DoubleSide
                     });
 
-                    // 佛像主体 - 使用平面几何体显示纹理
-                    const buddhaPlaneGeom = new THREE.PlaneGeometry(0.28, 0.4);
+                    // 佛像主体 - 增大尺寸提高可见度
+                    const buddhaPlaneGeom = new THREE.PlaneGeometry(0.4, 0.55);
                     
                     // 正面
                     const buddhaFront = new THREE.Mesh(buddhaPlaneGeom, buddhaMat);
-                    buddhaFront.position.y = 0.2;
+                    buddhaFront.position.y = 0.25;
                     buddhaFront.position.z = 0.01;
                     buddhaFront.castShadow = true;
                     group.add(buddhaFront);
@@ -1176,32 +1177,56 @@
                     // 背面
                     const backMat = new THREE.MeshStandardMaterial({
                         map: backTexture,
-                        metalness: 0.3,
-                        roughness: 0.6,
-                        emissive: 0x221100,
-                        emissiveIntensity: 0.15,
+                        metalness: 0.2,
+                        roughness: 0.5,
+                        emissive: 0xffaa44,
+                        emissiveIntensity: 0.8,
                         side: THREE.DoubleSide
                     });
                     const buddhaBack = new THREE.Mesh(buddhaPlaneGeom, backMat);
-                    buddhaBack.position.y = 0.2;
+                    buddhaBack.position.y = 0.25;
                     buddhaBack.position.z = -0.01;
                     buddhaBack.rotation.y = Math.PI;
                     buddhaBack.castShadow = true;
                     group.add(buddhaBack);
 
-                    // 莲花底座
-                    const lotusGeom = new THREE.CylinderGeometry(0.16, 0.2, 0.08, 32);
+                    // 莲花底座 - 增强可见度
+                    const lotusGeom = new THREE.CylinderGeometry(0.18, 0.22, 0.1, 32);
                     const lotusMat = new THREE.MeshStandardMaterial({
                         color: 0xff6b9d,
-                        metalness: 0.4,
-                        roughness: 0.5,
-                        emissive: 0x330011,
-                        emissiveIntensity: 0.2
+                        metalness: 0.3,
+                        roughness: 0.4,
+                        emissive: 0xff3366,
+                        emissiveIntensity: 0.5
                     });
                     const lotus = new THREE.Mesh(lotusGeom, lotusMat);
                     lotus.position.y = -0.04;
                     lotus.receiveShadow = true;
                     group.add(lotus);
+
+                    // 添加发光光环效果 - 让中心更醒目
+                    const glowRingGeom = new THREE.TorusGeometry(0.35, 0.015, 16, 64);
+                    const glowRingMat = new THREE.MeshBasicMaterial({
+                        color: 0xffaa44,
+                        transparent: true,
+                        opacity: 0.6
+                    });
+                    const glowRing = new THREE.Mesh(glowRingGeom, glowRingMat);
+                    glowRing.rotation.x = Math.PI / 2;
+                    glowRing.position.y = 0.02;
+                    group.add(glowRing);
+
+                    // 第二层光环
+                    const glowRing2Geom = new THREE.TorusGeometry(0.45, 0.008, 16, 64);
+                    const glowRing2Mat = new THREE.MeshBasicMaterial({
+                        color: 0xff8844,
+                        transparent: true,
+                        opacity: 0.3
+                    });
+                    const glowRing2 = new THREE.Mesh(glowRing2Geom, glowRing2Mat);
+                    glowRing2.rotation.x = Math.PI / 2;
+                    glowRing2.position.y = 0.01;
+                    group.add(glowRing2);
 
                     // 莲花花瓣
                     const buddhaPetalCount = 12;
@@ -1415,7 +1440,7 @@
             scene.add(ambientLight);
 
             // 中心点光源 - 暖橙色烛光
-            lightSource = new THREE.PointLight(0xffaa55, 80, 8);
+            lightSource = new THREE.PointLight(0xffaa55, 120, 10);
             lightSource.position.set(0, 0.45, 0);
             lightSource.castShadow = true;
             lightSource.shadow.mapSize.width = 512;
@@ -1447,7 +1472,7 @@
             scene.add(lightGlow);
 
             // 次级补光 - 让边缘可见
-            const fillLight = new THREE.PointLight(0xff8844, 15, 4);
+            const fillLight = new THREE.PointLight(0xff8844, 30, 6);
             fillLight.position.set(0, 0.1, 0);
             scene.add(fillLight);
         }
