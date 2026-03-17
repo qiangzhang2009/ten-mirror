@@ -1609,22 +1609,17 @@
         }
 
         function setupPostProcessing() {
-            composer = new EffectComposer(renderer);
-
-            const renderPass = new RenderPass(scene, camera);
-            composer.addPass(renderPass);
-
-            // Bloom效果 - 模拟烛光泛光
-            const bloomPass = new UnrealBloomPass(
-                new THREE.Vector2(window.innerWidth, window.innerHeight),
-                0.8,
-                0.4,
-                0.85
-            );
-            composer.addPass(bloomPass);
-
-            const outputPass = new OutputPass();
-            composer.addPass(outputPass);
+            // 暂时禁用后处理效果以提升性能
+            // composer = new EffectComposer(renderer);
+            // const renderPass = new RenderPass(scene, camera);
+            // composer.addPass(renderPass);
+            // const bloomPass = new UnrealBloomPass(
+            //     new THREE.Vector2(window.innerWidth, window.innerHeight),
+            //     0.8, 0.4, 0.85
+            // );
+            // composer.addPass(bloomPass);
+            // const outputPass = new OutputPass();
+            // composer.addPass(outputPass);
         }
 
         function setupEventListeners() {
@@ -1804,7 +1799,6 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            composer.setSize(window.innerWidth, window.innerHeight);
 
             // 更新反射器尺寸
             const textureSize = Math.min(256, Math.max(128, window.innerWidth / 8));
@@ -1861,7 +1855,7 @@
             // 更新光线可视化
             updateRayVisualization(delta);
 
-            composer.render();
+            renderer.render(scene, camera);
 
             frameCount++;
             const now = performance.now();
