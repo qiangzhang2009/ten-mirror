@@ -1232,15 +1232,6 @@
                     halo3.position.y = 0.32;
                     halo3.rotation.x = Math.PI / 2;
                     group.add(halo3);
-                    const baseMat = new THREE.MeshStandardMaterial({
-                        color: 0x6b4423,
-                        metalness: 0.4,
-                        roughness: 0.6
-                    });
-                    const base = new THREE.Mesh(baseGeom, baseMat);
-                    base.position.y = 0.03;
-                    base.castShadow = true;
-                    group.add(base);
                     break;
 
                 case 'lotus':
